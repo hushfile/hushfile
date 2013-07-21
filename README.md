@@ -6,14 +6,11 @@ hushfile is a file sharing service with clientside encryption. Idea and initial 
 This code is released under 2-clause BSD license, so you are free to use this code to run your own hushfile service, modify the code, or whatever you like.
 
 Theory of Operation
--------------------
+====================
 The hushfile server is pretty simple, most of the hard work is done by the clients. The server basically takes requests and replies with HTTP status codes and json blobs. The server has an upload function which returns a fileid, the rest of the operations require an existing fileid.
 
-The following sections describe the server API and the client functions. The details are probably only relevant if you are curious or if you are implementing a new client.
+The following describes the client workflow. The details are probably only relevant if you are curious or if you are implementing a new client.
 
-
-Client operation
-================
 A client has two basic jobs: uploading and downloading. This section describes how a client operates, based on the hushfile/hushfile-web client. If you are implementing a new client read the API file for details.
 
 
