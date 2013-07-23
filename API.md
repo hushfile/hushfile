@@ -1,8 +1,8 @@
-Hushfile Server API
-====================
+Hushfile Server API - Uploading
+================================
 
-Uploading
----------
+/api/upload
+------------
 	/api/upload
 A POST to <code>/api/upload</code> uploads a new file to hushfile, or a new chunk of an existing file. 
 
@@ -38,6 +38,8 @@ The deletepassword is present in both <code>serverdata.json</code> and in the en
 
 *Please note* It is possible for a malicious client to construct an upload where the deletepassword POSTed to the server is different from the one inside the encrypted metadata blob. This will effectively create an upload that cannot be deleted by clients who don't know the real deletepassword. This is a designflaw that the author is aware of. Suggestions for alternative approaches appreciated.
 
+/api/finishupload
+------------------
 	/api/finishupload
 A POST to <code>/api/finishupload</code> finishes an upload, meaning that no more parts of this file will be uploaded. The POST must contain the following fields:
 - <code>fileid</code> (the ID of the upload being finished)
@@ -53,24 +55,36 @@ The server returns a json response with the following fields:
 
 When finishupload is called the server will check if any chunks are missing, based on the names of the files. If cryptofile.0 and cryptofile.2 are there, but there is no cryptofile.1 then the server must refuse to mark the upload as finished.
 
-Downloading etc.
-----------------
+Hushfile Server API - Downloading
+==================================
 These functions take a fileid as parameter to work. If the specified fileid does not exist, the server returns a HTTP 404 and a json blob with two elements, fileid and exists=false. This is checked before the functions below are called, so they all operate on existing valid fileids.
 
+/api/file
+----------
 	/api/file?fileid=abcdef&chunknumber=N
 This request returns the encrypted filedata for the specified fileid, chunk number N, or HTTP <code>416 Requested Range Not Satisfiable</code> and a JSON error if the chunk doesn't exist in the following format: {"fileid": "blah", "status": "Chunk number N does not exist"}
 
+/api/metadata
+--------------
 	/api/metadata?fileid=abcdef
 This request downloads the encrypted metadata for the specified fileid.
 
-Other API functions
---------------------
+Hushfile Server API - Other API Functions
+==========================================
+These functions take a fileid as parameter to work. If the specified fileid does not exist, the server returns a HTTP 404 and a json blob with two elements, fileid and exists=false. This is checked before the functions below are called, so they all operate on existing valid fileids.
+
+/api/delete
+------------
 	/api/delete?fileid=abcdef&deletepassword=blah
 This request checks if the deletepassword is valid. If it is valid, the given fileid is deleted (filedata, metadata and serverdata are all deleted), and the server then returns a json blob containing two fields fileid and deleted=true. If the deletepassword is incorrect the server returns HTTP 401 and a json blob with two fields, fileid and deleted=false.
 
+/api/ip
+--------
 	/api/ip?fileid=abcdef
 This request returns a jsob blob with two fields, fileid and uploadip, uploadip is a comma seperated list of all IPs that have uploaded one or more chunks of the given fileid. Note that it does not require a valid password to get the uploader ips of a given fileid. The authors are aware of this and regard it as a feature.
 
+/api/exists
+------------
 	/api/exists?fileid=abcdef
 This returns a json blob with the following elements:
 - <code>fileid</code>
@@ -81,5 +95,5 @@ This returns a json blob with the following elements:
 
 
 Other requests
----------------
+===============
 The server answers all other requests with a HTTP 400 and a json blob with two fields, fileid and status="bad request".
