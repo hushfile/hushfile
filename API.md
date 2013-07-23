@@ -3,7 +3,7 @@ Hushfile Server API
 
 Uploading
 ---------
-	<code>/api/upload</code>
+	/api/upload
 A POST to <code>/api/upload</code> uploads a new file to hushfile, or a new chunk of an existing file. 
 
 If uploading a new file the POST should contain the following fields to be valid:
@@ -38,7 +38,7 @@ The deletepassword is present in both <code>serverdata.json</code> and in the en
 
 *Please note* It is possible for a malicious client to construct an upload where the deletepassword POSTed to the server is different from the one inside the encrypted metadata blob. This will effectively create an upload that cannot be deleted by clients who don't know the real deletepassword. This is a designflaw that the author is aware of. Suggestions for alternative approaches appreciated.
 
-	<code>/api/finishupload</code>
+	/api/finishupload
 A POST to <code>/api/finishupload</code> finishes an upload, meaning that no more parts of this file will be uploaded. The POST must contain the following fields:
 - <code>fileid</code> (the ID of the upload being finished)
 - <code>uploadpassword</code> (The uploadpassword that was returned when the last part of this fileid was uploaded)
@@ -57,7 +57,7 @@ Downloading etc.
 ----------------
 All these functions take a fileid as parameter to work. If the specified fileid does not exist, the server returns a HTTP 404 and a json blob with two elements, fileid and exists=false. This is checked before the functions below are called, so they all operate on existing valid fileids.
 
-	<code>/api/exists?fileid=abcdef</code>
+	/api/exists?fileid=abcdef
 This returns a json blob with the following elements:
 - <code>fileid</code>
 - <code>exists</code> (true for a valid fileid, false for invalid)
@@ -65,16 +65,16 @@ This returns a json blob with the following elements:
 - <code>totalsize</code> (total size of all the chunks in bytes, or 0 for an invalid fileid)
 - <code>finished</code> (true if the upload has been finished, false if not)
 
-	<code>/api/file?fileid=abcdef&chunknumber=N</code>
+	/api/file?fileid=abcdef&chunknumber=N
 This request returns the encrypted filedata for the specified fileid, chunk number N, or HTTP <code>416 Requested Range Not Satisfiable</code> and a JSON error if the chunk doesn't exist in the following format: {"fileid": "blah", "status": "Chunk number N does not exist"}
 
-	<code>/api/metadata?fileid=abcdef</code>
+	/api/metadata?fileid=abcdef
 This request downloads the encrypted metadata for the specified fileid.
 
-	<code>/api/delete?fileid=abcdef&deletepassword=blah</code>
+	/api/delete?fileid=abcdef&deletepassword=blah
 This request checks if the deletepassword is valid. If it is valid, the given fileid is deleted (filedata, metadata and serverdata are all deleted), and the server then returns a json blob containing two fields fileid and deleted=true. If the deletepassword is incorrect the server returns HTTP 401 and a json blob with two fields, fileid and deleted=false.
 
-	<code>/api/ip?fileid=abcdef</code>
+	/api/ip?fileid=abcdef
 This request returns a jsob blob with two fields, fileid and uploadip, uploadip is a comma seperated list of all IPs that have uploaded one or more chunks of the given fileid. Note that it does not require a valid password to get the uploader ips of a given fileid. The authors are aware of this and regard it as a feature.
 
 Other requests
