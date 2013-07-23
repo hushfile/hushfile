@@ -55,7 +55,21 @@ When finishupload is called the server will check if any chunks are missing, bas
 
 Downloading etc.
 ----------------
-All these functions take a fileid as parameter to work. If the specified fileid does not exist, the server returns a HTTP 404 and a json blob with two elements, fileid and exists=false. This is checked before the functions below are called, so they all operate on existing valid fileids.
+These functions take a fileid as parameter to work. If the specified fileid does not exist, the server returns a HTTP 404 and a json blob with two elements, fileid and exists=false. This is checked before the functions below are called, so they all operate on existing valid fileids.
+
+	/api/file?fileid=abcdef&chunknumber=N
+This request returns the encrypted filedata for the specified fileid, chunk number N, or HTTP <code>416 Requested Range Not Satisfiable</code> and a JSON error if the chunk doesn't exist in the following format: {"fileid": "blah", "status": "Chunk number N does not exist"}
+
+	/api/metadata?fileid=abcdef
+This request downloads the encrypted metadata for the specified fileid.
+
+Other API functions
+--------------------
+	/api/delete?fileid=abcdef&deletepassword=blah
+This request checks if the deletepassword is valid. If it is valid, the given fileid is deleted (filedata, metadata and serverdata are all deleted), and the server then returns a json blob containing two fields fileid and deleted=true. If the deletepassword is incorrect the server returns HTTP 401 and a json blob with two fields, fileid and deleted=false.
+
+	/api/ip?fileid=abcdef
+This request returns a jsob blob with two fields, fileid and uploadip, uploadip is a comma seperated list of all IPs that have uploaded one or more chunks of the given fileid. Note that it does not require a valid password to get the uploader ips of a given fileid. The authors are aware of this and regard it as a feature.
 
 	/api/exists?fileid=abcdef
 This returns a json blob with the following elements:
@@ -65,17 +79,6 @@ This returns a json blob with the following elements:
 - <code>totalsize</code> (total size of all the chunks in bytes, or 0 for an invalid fileid)
 - <code>finished</code> (true if the upload has been finished, false if not)
 
-	/api/file?fileid=abcdef&chunknumber=N
-This request returns the encrypted filedata for the specified fileid, chunk number N, or HTTP <code>416 Requested Range Not Satisfiable</code> and a JSON error if the chunk doesn't exist in the following format: {"fileid": "blah", "status": "Chunk number N does not exist"}
-
-	/api/metadata?fileid=abcdef
-This request downloads the encrypted metadata for the specified fileid.
-
-	/api/delete?fileid=abcdef&deletepassword=blah
-This request checks if the deletepassword is valid. If it is valid, the given fileid is deleted (filedata, metadata and serverdata are all deleted), and the server then returns a json blob containing two fields fileid and deleted=true. If the deletepassword is incorrect the server returns HTTP 401 and a json blob with two fields, fileid and deleted=false.
-
-	/api/ip?fileid=abcdef
-This request returns a jsob blob with two fields, fileid and uploadip, uploadip is a comma seperated list of all IPs that have uploaded one or more chunks of the given fileid. Note that it does not require a valid password to get the uploader ips of a given fileid. The authors are aware of this and regard it as a feature.
 
 Other requests
 ---------------
