@@ -50,7 +50,7 @@ Downloading
 1. A hushfile URL is supplied by the user
 2. The client checks if the fileid is a valid and finished upload on the server, by querying `https://servername/api/exists?fileid=51928de7aba77`
 3. If the fileid is valid and the upload is finished the server will reply with a HTTP 200 with a JSON body like so: `{"fileid": "51928de7aba77", "exists": true, "chunks": 2, "totalsize": 123432, "finished": true}`
-3.5. If the fileid is valid but the upload has not been finished the server will reply with a "HTTP 412 Precondition Failed" with a JSON body like so: `{"fileid": "51928de7aba77", "exists": true, "chunks": 2, "totalsize": 123432, "finished": false}`
+3. If the fileid is valid but the upload has not been finished the server will reply with a "HTTP 412 Precondition Failed" with a JSON body like so: `{"fileid": "51928de7aba77", "exists": true, "chunks": 2, "totalsize": 123432, "finished": false}`
 4. If the fileid is invalid the server will reply with a HTTP 404 with a JSON body like so: `{"fileid": "51928de7aba77", "exists": false, "chunks": 0, "totalsize": 0, "finished": false}`
 5. If a password was not supplied, the client must ask the user for a password
 6. The client must then download the metadata from the server by querying `https://servername/api/metadata?fileid=51928de7aba77`
@@ -63,7 +63,7 @@ Downloading
 If the deletion fails because the deletepassword is incorrect, the server responds with a HTTP 401 and a JSON object like this: `{"fileid": "51928de7aba77", "deleted": false}`
 13. If the client wants to download the file, the client can get the data by sending a request to `https://servername/api/file?fileid=51928de7aba77&chunknumber=N`
 14. The client must then decrypt the file with the same password as the metadata was decrypted with.
-14.5 Repeat for every chunk, put the chunks together when all of them are downloaded
+14. Repeat for every chunk, put the chunks together when all of them are downloaded
 15. Finally the client can prompt the user to save the file somewhere.
 16. The client should still have an active delete button after download, so a user can delete a file after downloading.
 
