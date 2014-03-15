@@ -16,7 +16,7 @@ A client has two basic jobs: uploading and downloading. This section describes h
 Uploading
 =============
 ###### 0. Call serverinfo API function
-Initialize client by calling the serverinfo API function to display max file size (if any) and max server retention time (if any) to the user.
+Initialize client by calling the serverinfo API function to display the servers max file size (if any) and max retention time (if any) to the user.
 
 ###### 1. Pick file
 A file is selected by the user.
@@ -25,17 +25,18 @@ A file is selected by the user.
 The client must check the file size against the maxsize value returned by the serverinfo API function, and display an error if it is too large.
 
 ###### 3. Decide on chunking
-The client should decide whether or not to use chunking, possibly have the user decide. The serverinfo API function returns a maxchunksize value which should be taken into consideration.
+The client should decide whether or not to use chunking, and a chunksize. The serverinfo API function returns a maxchunksize value which should be taken into consideration.
 
 ###### 4. Generate passwords
-The client must generate two passwords, one for the encryption, and one deletepassword. It should be possible but difficult for a user to choose custom passwords. Long automatically generated alphanumeric password are the most secure.
+The client must generate an encryption password. If the user wants the file to be deletable a deletepassword should also be generated. It should be possible but difficult for a user to choose custom passwords. Long automatically generated alphanumeric password are the most secure.
 
 ###### 5. Generate metadata json
-The client must generate a json object containing four fields:
+The client must generate a json object containing four fields if the file should be deletable:
 	`{"filename": "secretfile.txt", "mimetype": "text/plain", "filesize": "532", "deletepassword": "vK36ocTGHaz8OYcjHX5voD8j3MgsGkg8JAXAefqe"}`
+If the file should not be deletable the `deletepassword` field should be omitted.
 
 ###### 6. Encrypt metadata json
-The client must encrypt the json with the same password as the filedata, and base64 encode that as well.
+The client must encrypt the json with the encryption password, and base64 encode the resulting data.
 
 ###### 7. Encrypt first file chunk
 The client must encrypt the first chunk of the file and base64 encode the data. If the servers permitted chunksize and the clients desired chunksize are both equal to or larger than than the total filesize there will only be one chunk.
