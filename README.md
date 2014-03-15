@@ -16,18 +16,28 @@ A client has two basic jobs: uploading and downloading. This section describes h
 
 Uploading without chunking
 ---------------------------
-###### 1. A file is selected by the user
-###### 2. The client should check the file size against the server maxsize API function, and display an error if it is too large.
-###### 3. The client should decide wether or not to use chunking, possibly have the user decide. Uploading smaller chunks of a large file will be less ressource intensive. In this case, the whole file is uploaded in one piece.
-###### 4. The client must generate two passwords, one for the encryption, and one deletepassword. It should be possible but difficult for a user to choose custom passwords. Long automatically generated alphanumeric password are the most secure.
-###### 5. The client must encrypt the file and base64 encode the data.
-###### 6. The client must generate a json object containing four fields:
+###### 1. 
+A file is selected by the user
+###### 2. 
+The client should check the file size against the server maxsize API function, and display an error if it is too large.
+###### 3. 
+The client should decide wether or not to use chunking, possibly have the user decide. Uploading smaller chunks of a large file will be less ressource intensive. In this case, the whole file is uploaded in one piece.
+###### 4. 
+The client must generate two passwords, one for the encryption, and one deletepassword. It should be possible but difficult for a user to choose custom passwords. Long automatically generated alphanumeric password are the most secure.
+###### 5. 
+The client must encrypt the file and base64 encode the data.
+###### 6. 
+The client must generate a json object containing four fields:
 	`{"filename": "secretfile.txt", "mimetype": "text/plain", "filesize": "532", "deletepassword": "vK36ocTGHaz8OYcjHX5voD8j3MgsGkg8JAXAefqe"}`
-###### 7. The client must encrypt the json with the same password as the filedata, and base64 encode that as well.
-###### 8. The client must do a HTTP post to `https://servername/api/upload` with five fields: `cryptofile`, `metadata`, `deletepassword`, `chunknumber` (always 0 when not chunking) and `finishupload`. 
-###### 9. The client will get a HTTP 200 response with a JSON body which contains five fields:
+###### 7. 
+The client must encrypt the json with the same password as the filedata, and base64 encode that as well.
+###### 8. 
+The client must do a HTTP post to `https://servername/api/upload` with five fields: `cryptofile`, `metadata`, `deletepassword`, `chunknumber` (always 0 when not chunking) and `finishupload`. 
+###### 9. 
+The client will get a HTTP 200 response with a JSON body which contains five fields:
 {"fileid": "51928de7aba77", "status": "OK", "chunks": "1", "totalsize": "12345", "finished": true}
-###### 10. The client must finally present a link to the user, in the format `https://servername/fileid#password`
+###### 10. 
+The client must finally present a link to the user, in the format `https://servername/fileid#password`
 
 Uploading with chunking
 ------------------------
