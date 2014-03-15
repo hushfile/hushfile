@@ -12,6 +12,7 @@ The following describes the client workflow. The details are probably only relev
 
 A client has two basic jobs: uploading and downloading. This section describes how a client operates, based on the hushfile/hushfile-web client. If you are implementing a new client read the API file for details.
 
+
 Uploading
 =============
 ###### 1. Pick file
@@ -39,12 +40,15 @@ The client must encrypt the first chunk of the file and base64 encode the data. 
 ###### 8. Upload first chunk and metadata
 The client must do a HTTP post to `https://servername/api/upload` with five fields: `cryptofile`, `metadata`, `deletepassword`, `chunknumber` and `finishupload`. The number of the first chunk is `0`. The `finishupload` field must be set to true if this is the only chunk, and false if there are additional chunks. The metadata must be uploaded with the first chunk.
 
-###### 9. Receive response with fileid
-The client will get a HTTP 200 response with a JSON body which contains five fields:
-`{"fileid": "51928de7aba77", "status": "OK", "chunks": "1", "totalsize": "12345", "finished": false}`
+###### 9. Receive response with fileid and uploadpassword
+The client will get a HTTP 200 response with a JSON body which contains six fields:
+`{"fileid": "51928de7aba77", "status": "OK", "chunks": "1", "totalsize": "12345", "finished": false, "uploadpassword": "abc123DEF456"}`
+
+If the upload is finished `uploadpassword` will be empty, otherwise it contains the password neccesary to upload new chunks.
 
 ###### 10. Encrypt and upload remaining chunks
-If any chunks remain the client must encrypt and upload each one with a HTTP post to `https://servername/api/upload` with three fields: `cryptofile`, `chunknumber` and `finishupload`. This can be done in parallel if desired. When the last chunk is uploaded the `finishupload` field should be set to true, or the upload can be marked as finished by using the seperate `finishupload` API call.
+If any chunks remain the client must encrypt and upload each one with a HTTP post to `https://servername/api/upload` with four fields: `cryptofile`, `chunknumber`, `uploadpassword` and `finishupload`. This can be done in parallel if desired. When the last chunk is uploaded the `finishupload` field should be set to true, or the upload can be marked as finished by using the seperate `finishupload` API call. For each chunk uploaded successfully the client will get a HTTP 200 response with a JSON body like this:
+`{"fileid": "51928de7aba77", "status": "OK", "chunks": "3", "totalsize": "1234567", "finished": false}`
 
 ###### 11. Present link to the user
 The client must finally present a link to the user, in the format `https://servername/fileid#password`
