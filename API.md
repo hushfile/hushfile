@@ -1,9 +1,8 @@
 Hushfile Server API - Uploading
 ================================
 
-/api/upload
+POST /api/upload
 -----------------
-`/api/upload`
 A POST to `/api/upload` uploads a new file to hushfile, or uploads a new chunk of an existing file. 
 
 If uploading a new file the POST should contain the following fields to be valid:
@@ -38,9 +37,8 @@ After an upload has been finished, the file `uploadpassword` will be deleted, in
 For deletable files the `deletepassword` is present in both `serverdata.json` and in the encrypted metadata, this makes it possible for the server to authenticate file deletions. This means that only users with the correct file password, which in turn can unlock the correct `deletepassword`, can delete a given fileid.
 
 
-/api/finishupload
+POST /api/finishupload
 -------------------------
-`/api/finishupload`
 A POST to `/api/finishupload` finishes an upload, meaning that no more parts of this file will be uploaded. The POST must contain the following fields:
 - `fileid` (the ID of the upload being finished)
 - `uploadpassword` (The `uploadpassword` that was returned when the first chunk of this fileid was uploaded)
@@ -59,34 +57,31 @@ Hushfile Server API - Downloading
 ===============================
 These functions take a fileid as parameter to work. If the specified fileid does not exist, the server returns a HTTP 404 and a json blob with two elements, fileid and exists=false. This is checked before the functions below are called, so they all operate on existing valid fileids.
 
-/api/file
+GET /api/file
 --------------
-`/api/file?fileid=abcdef&chunknumber=N`
-This request returns the encrypted filedata for the specified fileid, chunk number N, or HTTP <code>416 Requested Range Not Satisfiable</code> and a JSON error if the chunk doesn't exist in the following format: {"fileid": "blah", "status": "Chunk number N does not exist"}
+`/api/file?fileid=abcdef&chunknumber=N` This request returns the encrypted filedata for the specified fileid, chunk number N, or HTTP <code>416 Requested Range Not Satisfiable</code> and a JSON error if the chunk doesn't exist in the following format: {"fileid": "blah", "status": "Chunk number N does not exist"}
 
-/api/metadata
+GET /api/metadata
 ----------------------
-`/api/metadata?fileid=abcdef`
-This request downloads the encrypted metadata for the specified fileid.
+`/api/metadata?fileid=abcdef` This request downloads the encrypted metadata for the specified fileid.
 
 Hushfile Server API - Other API Functions
 ======================================
 These functions take a fileid as parameter to work. If the specified fileid does not exist, the server returns a HTTP 404 and a json blob with two elements, fileid and exists=false. This is checked before the functions below are called, so they all operate on existing valid fileids.
 
-/api/delete
+POST /api/delete
 -----------------
 `/api/delete?fileid=abcdef&deletepassword=blah`
-This request checks if the `deletepassword` is valid. If it is valid, the given fileid is deleted (filedata, metadata and serverdata are all deleted), and the server then returns a json blob containing two fields fileid and deleted=true. If the `deletepassword` is incorrect the server returns HTTP 401 and a json blob with two fields, fileid and deleted=false.
+A POST to /api/delete must contain two fields, the `fileid`and the `deletepassword`. The server first checks if the `deletepassword` is valid. If it is valid, the given fileid is deleted (filedata, metadata and serverdata are all deleted), and the server then returns a json blob containing two fields fileid and deleted=true. If the `deletepassword` is incorrect (or no deletepassword exists for the fileid) the server returns HTTP 401 and a json blob with two fields, fileid and deleted=false.
 
-/api/ip
------------
+GET /api/ip
+-------------
 `/api/ip?fileid=abcdef`
 This request returns a jsob blob with two fields, `fileid` and `uploadip`. `uploadip` is a comma seperated list of all IPs that have uploaded one or more chunks of the given `fileid`. Note that it does not require a valid password to get the uploader ips of a given fileid. This is a feature.
 
-/api/exists
+GET /api/exists
 ----------------
-`/api/exists?fileid=abcdef`
-This returns a json blob with the following elements:
+`/api/exists?fileid=abcdef` This returns a json blob with the following elements:
 - `fileid`
 - `exists` (true for a valid fileid, false for invalid)
 - `chunks` (how many chunks this upload consists of, or 0 for an invalid fileid)
@@ -94,10 +89,9 @@ This returns a json blob with the following elements:
 - `finished` (true if the upload has been finished, false if not)
 
 
-/api/serverinfo
------------------
-`/api/serverinfo`
-This returns a json blob with the following elements:
+GET /api/serverinfo
+---------------------
+`/api/serverinfo` This returns a json blob with the following elements:
 - `serveroperatoremail` (Server operator email)
 - `maxretentionhours` (The maximum number of hours a file will be kept on the server)
 - `maxfilesize` (The maximum total filesize)
