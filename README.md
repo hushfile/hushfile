@@ -31,7 +31,7 @@ Uploading without chunking
 
 Uploading with chunking
 ------------------------
-1. A file is selected by the user
+###### 1. A file is selected by the user
 2. The client should check the file size against the server maxsize API function, and display an error if it is too large.
 3. The client should decide wether or not to use chunking, possibly have the user decide. Uploading smaller chunks of a large file will be less ressource intensive. In this case the file is uploaded in multiple chunks.
 4. The client must generate two passwords, one for the encryption, and one deletepassword. It should be possible but difficult for a user to choose custom passwords. Long automatically generated alphanumeric password are the most secure.
@@ -41,7 +41,7 @@ Uploading with chunking
 7. The client must encrypt the json with the same password as the filedata, and base64 encode that as well.
 8. The client must do a HTTP post to `https://servername/api/upload` with five fields: `cryptofile`, `metadata`, `deletepassword`, `chunknumber` and `finishupload`. 
 9. The client will get a HTTP 200 response with a JSON body which contains five fields:
-{"fileid": "51928de7aba77", "status": "OK", "chunks": "1", "totalsize": "12345", "finished": false}
+`{"fileid": "51928de7aba77", "status": "OK", "chunks": "1", "totalsize": "12345", "finished": false}`
 10. The client repeats points 5 through 9 until no more chunks remain. The last upload POST should set `finishupload` to true or use the seperate `finishupload` API call to mark the upload as finished.
 11. The client must finally present a link to the user, in the format `https://servername/fileid#password`
 
