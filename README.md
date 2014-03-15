@@ -50,7 +50,11 @@ The client will get a HTTP 200 response with a JSON body which contains six fiel
 If the upload is finished `uploadpassword` will be empty, otherwise it contains the password neccesary to upload new chunks.
 
 ###### 10. Encrypt and upload remaining chunks
-If any chunks remain the client must encrypt and upload each one with a HTTP post to `https://servername/api/upload` with four fields: `cryptofile`, `chunknumber`, `uploadpassword` and `finishupload`. This can be done in parallel if desired. When the last chunk is uploaded the `finishupload` field should be set to true, or the upload can be marked as finished by using the seperate `finishupload` API call. For each chunk uploaded successfully the client will get a HTTP 200 response with a JSON body like this:
+If any chunks remain the client must encrypt and upload each one with a HTTP post to `https://servername/api/upload` with five fields: `fileid`, `cryptofile`, `chunknumber`, `uploadpassword` and `finishupload`. This can be done in parallel if desired. 
+
+When the last chunk is uploaded the `finishupload` field should be set to true, or the upload can be marked as finished by using the seperate `finishupload` API call. 
+
+For each chunk uploaded successfully the client will get a HTTP 200 response with a JSON body like this:
 `{"fileid": "51928de7aba77", "status": "OK", "chunks": "3", "totalsize": "1234567", "finished": false}`
 
 ###### 11. Present link to the user
