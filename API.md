@@ -94,6 +94,15 @@ This returns a json blob with the following elements:
 - `finished` (true if the upload has been finished, false if not)
 
 
+/api/serverinfo
+-----------------
+`/api/serverinfo`
+This returns a json blob with the following elements:
+- `serveroperatoremail` (Server operator email)
+- `maxretentionhours` (The maximum number of hours a file will be kept on the server)
+- `maxfilesize` (The maximum total filesize)
+- `maxchunksize` (The maximum size of each chunk)
+
 Other requests
 ===============
 The server answers all other requests with a HTTP 400 and a json blob with two fields, fileid and status="bad request".
