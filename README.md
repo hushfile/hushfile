@@ -15,6 +15,9 @@ A client has two basic jobs: uploading and downloading. This section describes h
 
 Uploading
 =============
+###### 0. Call serverinfo API function
+Initialize client by calling the serverinfo API function to display max file size (if any) and max server retention time (if any) to the user.
+
 ###### 1. Pick file
 A file is selected by the user.
 
