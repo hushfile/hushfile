@@ -36,10 +36,10 @@ The client must generate a json object containing four fields if the file should
 If the file should not be deletable the `deletepassword` field should be omitted.
 
 ###### 6. Encrypt metadata json
-The client must encrypt the json with the encryption password, and base64 encode the resulting data.
+The client must encrypt the metadata json with the encryption password.
 
 ###### 7. Encrypt first file chunk
-The client must encrypt the first chunk of the file and base64 encode the data. If the servers permitted chunksize and the clients desired chunksize are both equal to or larger than than the total filesize there will only be one chunk.
+The client must encrypt the first chunk of the file. If the servers permitted chunksize and the clients desired chunksize are both equal to or larger than than the total filesize there will only be one chunk.
 
 ###### 8. Upload first chunk and metadata
 The client must do a HTTP post to `https://servername/api/upload` with five fields: `cryptofile`, `metadata`, `deletepassword`, `chunknumber` and `finishupload`. The number of the first chunk is `0`. The `finishupload` field must be set to true if this is the only chunk, and false if there are additional chunks. The metadata must be uploaded with the first chunk.
