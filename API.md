@@ -77,7 +77,7 @@ A POST to /api/delete must contain two fields, the `fileid`and the `deletepasswo
 GET /api/ip
 -------------
 `/api/ip?fileid=abcdef`
-This request returns a jsob blob with two fields, `fileid` and `uploadip`. `uploadip` is a comma seperated list of all IPs that have uploaded one or more chunks of the given `fileid`. Note that it does not require a valid password to get the uploader ips of a given fileid. This is a feature.
+This request returns a jsob blob with two fields, `fileid` and `uploadip`. `uploadip` is a comma seperated list of all IPs that have uploaded one or more chunks of the given `fileid`. Note that it does not require a valid password to get the uploader ips of a given fileid.
 
 GET /api/exists
 ----------------
