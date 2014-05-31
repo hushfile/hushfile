@@ -91,11 +91,11 @@ GET /api/exists
 
 GET /api/serverinfo
 ---------------------
-`/api/serverinfo` This returns a json blob with the following elements:
-- `serveroperatoremail` (Server operator email)
-- `maxretentionhours` (The maximum number of hours a file will be kept on the server)
-- `maxchunksize` (The maximum permitted size of each chunk)
-- `maxfilesize` (The maximum permitted total filesize)
+`/api/serverinfo` This returns a json blob with the following elements, which are all defined in the server config:
+- `server_operator_email` (Server operator email)
+- `max_retention_hours` (The maximum number of hours a file will be kept on the server)
+- `max_chunksize` (The maximum permitted size of each chunk)
+- `max_filesize` (The maximum permitted total filesize)
 
 Other requests
 ===============
