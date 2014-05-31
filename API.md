@@ -94,8 +94,7 @@ GET /api/serverinfo
 `/api/serverinfo` This returns a json blob with the following elements:
 - `serveroperatoremail` (Server operator email)
 - `maxretentionhours` (The maximum number of hours a file will be kept on the server)
-- `maxfilesize` (The maximum total filesize)
-- `maxchunksize` (The maximum size of each chunk)
+- `maxfilesize` (The maximum permitted total filesize)
 
 Other requests
 ===============
