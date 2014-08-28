@@ -61,9 +61,13 @@ GET /api/file
 --------------
 `/api/file?fileid=abcdef&chunknumber=N` This request returns the encrypted filedata for the specified fileid, chunk number N, or HTTP <code>416 Requested Range Not Satisfiable</code> and a JSON error if the chunk doesn't exist in the following format: {"fileid": "blah", "status": "Chunk number N does not exist"}
 
+If the upload is unfinished the server must instead return HTTP <code>412 Precondition Failed</code> and a json error in the following format: {"fileid": "blah", "status": "Upload is unfinished."}
+
 GET /api/metadata
 ----------------------
 `/api/metadata?fileid=abcdef` This request downloads the encrypted metadata for the specified fileid.
+
+If the upload is unfinished the server must instead return HTTP <code>412 Precondition Failed</code> and a json error in the following format: {"fileid": "blah", "status": "Upload is unfinished."}
 
 Hushfile Server API - Other API Functions
 ======================================
