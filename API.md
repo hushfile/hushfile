@@ -9,7 +9,7 @@ If uploading a new file the POST should contain the following fields to be valid
 - `cryptofile` (encrypted binary blob containing the actual file data)
 - `metadata` (encrypted binary blob containing info on the file: filename, size, mime type, and deletepassword.
 - `chunknumber` (the number of the chunk being uploaded, 0 if the file is not being uploaded in multiple parts)
-- `finishupload` (if set to true the upload will be marked as finished)
+- `finishupload` (JSON boolean, if set to true the upload will be marked as finished)
 - `deletepassword` (OPTIONAL: text field with the password used to delete the file from hushfile, only included if the file should be deletable)
 
 If uploading a new part (chunk) of an existing file, the fields `metadata` and `deletepassword` must be omitted, and the POST must additionally contain:
