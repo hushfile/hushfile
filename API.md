@@ -36,11 +36,11 @@ If the upload succeeds, a status code of 200 is returned. The body of the respon
 
 If the `uploadpassword` does not match the password set by the server a response with status code 403 is returned.
 
-GET /api/{id}/exists
+GET /api/file/{id}/exists
 --------------------
 If the file `id` exists, the repsonse status code is 200. If it does not exist the status code is 404.
 
-GET /api/{id}/info
+GET /api/file/{id}/info
 ------------------
 If the file exists a response with HTTP <code>200 OK</code> is returned with content-type `application/json` containing the fields:
 
