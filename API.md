@@ -9,6 +9,7 @@ A POST to `/api/file` initiates a new file that will be uploaded to hushfile. Th
 - `mac` - A Message Authentication Code (MAC) for the unencrypted metadata object.
 - `deletepassword` (optional) - A text field containing a password that the client will use in order to force removal of the file on the server.
 - `expire` (optional) - Unix timestamp indicating when the file expires and the server should remove it.
+- `limit` (optional) - The number of times the file may be downloaded before being deleted.
 - `chunks` (optional) - The number of chunks that the file is partitioned in. If it is set the upload will automatically stop when this number of chunks is reached.
 
 The server will respond with a 200 status code if the file upload is successfully initiated. The content is of type `application/json` with the following fields:
@@ -43,10 +44,14 @@ GET /api/{id}/info
 ------------------
 If the file exists a response with HTTP <code>200 OK</code> is returned with content-type `application/json` containing the fields:
 
-- `chunks` (how many chunks this upload consists of, or 0 for an invalid fileid)
-- `totalsize` (total size of all the chunks in bytes, or 0 for an invalid fileid)
-- `finished` (true if the upload has been finished, false if not)
+- `chunks` - how many chunks this upload consists of, or 0 for an invalid fileid
+- `totalsize` - total size of all the chunks in bytes, or 0 for an invalid fileid
+- `finished` - true if the upload has been finished, false if not
 - `ip` - A list of all IPs that participated in uploading file {id}.
+- `expire` - The UNIX timestamp indicating when it will expire.
+- `limit` - The total number of times the file can be downloaded.
+- `downloads` - The number of times the file has been downloaded.
+
 If the file does not exist a response with HTTP <code>404 Not Found</code> is returned.
 
 GET /api/file/{id}/metadata
