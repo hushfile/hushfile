@@ -10,24 +10,17 @@ A POST to `/api/file` initiates a new file that will be uploaded to hushfile. Th
 - `deletepassword` (optional) - A text field containing a password that the client will use in order to force removal of the file on the server.
 - `expire` (optional) - Unix timestamp indicating when the file expires and the server should remove it.
 - `limit` (optional) - The number of times the file may be downloaded before being deleted.
-- `chunks` (optional) - The number of chunks that the file is partitioned in. If it is set the upload will automatically stop when this number of chunks is reached.
 
 The server will respond with a 200 status code if the file upload is successfully initiated. The content is of type `application/json` with the following fields:
 
 - `id` - The unique identifier for the file used for subsequent requests
 - `uploadpassword` - The initial password that should be used for subsequent uploads of chunks
 
-PUT /api/file/{id}
--------------------
-When the upload has been initiated, chunks are PUT to the server with content-type `application/json` or `multipart/form-data` with the following fields:
+PUT /api/file/{id}/{index}
+--------------------------
+When the upload has been initiated, chunks are `PUT` to the server with content-type `application/octet-stream`.
 
-- `uploadpassword` - The password that was returned by the POST to `/api/file/`.
-- `index` - The index number of the chunk.
-- `chunk` - The encrypted blob that contains the file data of the chunk.
-- `mac` - The MAC code for the unencrypted version of the chunk.
-- `finishupload` - JSON boolean, if set to true, the upload will be marked as finished.
-
-If `finishupload` is true, the server checks whether chunks {id}.0, ..., {id}.N exists, if not, the upload is not finished.
+The `PUT` request must be accompanied with a querystring parameter called `uploadpassword` with the value recieved by the initial `POST` request to `/api/file`.
 
 If the upload succeeds, a status code of 200 is returned. The body of the response is `application/json` and contains the following fields:
 
@@ -35,6 +28,18 @@ If the upload succeeds, a status code of 200 is returned. The body of the respon
 - `finished` - JSON boolean indicating whether the upload is now finished.
 
 If the `uploadpassword` does not match the password set by the server a response with status code 403 is returned.
+
+POST /api/file/{id}/finishupload
+--------------------------------
+A request to `/api/file/{id}/finishupload` is finishes the file upload if a series of conditions are met. The content-type of the request is either `application/json` or `multipart/form-data` containing the following fields:
+
+- `uploadpassword` - The upload password specified by the initial `POST` request.
+- `chunks` - A list of chunk index numbers that the file consists of.
+
+If the following conditions are met, the server responds with a <code>200 OK</code>:
+
+1. The chunks specified in the `chunks` list have all been uploaded.
+2. The uploadpassword is removed to avoid any addition or alteration of the chunks.
 
 GET /api/file/{id}/exists
 --------------------
