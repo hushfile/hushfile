@@ -1,153 +1,154 @@
-Hushfile Server API
-===================
+# Hushfile Server API
 
-POST /
-------
-A POST to `/` initiates a new file that will be uploaded to hushfile. The data with the POST command should be of content-type `application/json` or `multipart/form-data` and contain the following fields to be valid:
+## Content Types
+If nothing else is stated explicitly, the server should accept requests with the `Content-Type` header of either `application/json` as well as `application/x-www-form-urlencoded` interchangeably and without differing in behaviour.
+
+The server responds to requests with `application/json`.
+When the server responds with <code>200 OK</code> the content type is `application/json`. The fields contained in the response will be described where needed. Otherwise the response is an empty object `{}`.
+
+In case of status errors, the default error pages of the webserver application is used. (TODO: Figure out how to customize the error pages)
+
+## Standard responses and requirements.
+
+### <code>400 Bad Request</code>
+If the `Content-Type` is wrong, or the request cannot be parsed, HTTP <code>400 Bad Request</code> is returned.
+
+### <code>401 Unauthorized</code>
+If the `key` is required for the request as a querystring parameter, HTTP <code>401 Unauthorized</code> is returned if the `key` is not present.
+
+### <code>403 Forbidden</code>
+If the `key` is required for the request as a querystring parameter, HTTP <code>403 Forbidden</code> is returned if the `key` from the request does not match the one on the server.
+
+### <code>404 Not Found</code>
+All requests with `{id}` and/or `{index}` as part of the path requires that the file/index exists. If the file `{id}` and/or `{index}` is not found on the server, HTTP <code>404 Not Found</code> is returned.
+
+If an endpoint with a pattern that is not described in the API is requests, HTTP <code>404 Not Found<code> is returned.
+This is also the case, if an endpoint of a pattern which is not described in the API is requested.
+
+### <code>412 Precondition Failed</code>
+If the request requires that the file upload for `{id}` is not complete, HTTP <code>412 Precondition Failed</code> is returned if file `{id}` is marked as complete.
+
+
+## API Endpoints
+### POST /
+Initiates a file upload to the server.
+
+The server accepts the following fields in the request:
 
 - `expires` (optional) - Unix timestamp indicating when the file expires and the server should remove it.
-- `limit` (optional) - The number of times the file may be downloaded before being deleted.
+- `metadata` (optional) - Initial metadata object of the same format as accepted for `PUT {id}/metadata`
 
-The server will respond with HTTP <code>200 OK</code> if the file upload is successfully initiated. The content is of type `application/json` with the following fields:
+If the following conditions are met, the request succeeds:
+
+1. The file *exists* on the server (e.g. as a directory)
+2. Information about expiry and download limit is persisted.
+3. Default file metadata data about the file is persisted.
+
+If the request is successful, the response contains the following fields:
 
 - `id` - The unique identifier for the file used for subsequent requests
 - `key` - A password used for subsequent file operations.
 
-This request is called *the inital `POST` request* throughout this document.
+
+### PUT /{id}
+Modifies the settings of the initiated file upload.
+
+The server requires that the file upload `{id}` is initiated and not complete, as well as the querystring parameter `key`.
+
+The server accepts the same fields as `POST /`.
+
+If the following conditions are met, the request succeeds:
+
+1. The modified file settings are persisted.
 
 
-PUT /{id}
----------
-Modify file configuration before the file upload is complete.
+### GET /{id}
+Returns server statistical information about file `{id}`.
 
-The endpoint takes the same arguments as `POST /`, however the `key` returned by the initial `POST` request is required as a querystring parameter.
+The server requires that file `{id}` is initiated.
 
-If the file configuration is updated HTTP <code>200 OK</code> is returned.
+The response contains the following fields:
 
-If the key is not present HTTP <code>400 Bad Request</code> is returned.
-
-If the key does not match HTTP <code>401 Unauthorized</code> is returned.
-
-
-PUT /{id}/metadata
-------------------
-(Should this in fact be a dictionary, where the encrypted metadata is a field as to not "hack" the api for making some metadata fields public?)
-
-Adds or updates a metadata file to `{id}`.
-
-The `PUT` request must be accompanied by a querystring parameter `key`.
-
-If the upload succeeds, the server responds with HTTP <code>200 OK</code>.
-
-If the upload has not been initialized HTTP <code>412 Precondition Failed</code> is returned.
-
-If the key is not present HTTP <code>400 Bad Request</code> is returned.
-
-If `key` does not match HTTP <code>401 Unauthorized</code> is returned.
-
-If this is not added, the file will be interpreted as `text/plain`.
-
-
-PUT /{id}/{index}
------------------
-When the upload has been initiated, chunks are `PUT` to the server with content-type `application/octet-stream`. `{id}` is the `id` value returned by the inital `POST` request. `{index}` is a natural number specifying the order of the chunk in relation to the other chunks.
-
-The `PUT` request must be accompanied with a querystring parameter named `key` with the value recieved by the initial `POST` request to `/`.
-
-If the upload succeeds, HTTP <code>200 OK</code> is returned.
-
-If the `key` does not match the key, HTTP <code>401 Unauthorized</code> is returned.
-
-If the key is not present HTTP <code>400 Bad Request</code> is returned.
-
-If a `PUT` is made to a file that is complete HTTP <code>409</code> is returned.
-
-If the file has not been initiated, HTTP <code>412 Precondition Failed</code> is returned.
-
-
-POST /{id}/complete
--------------------
-A `POST` request to `/{id}/complete` is finishes the file upload if a series of conditions are met. The content-type of the request is either `application/json` or `multipart/form-data` containing the following fields:
-
-- `chunks` - The number of chunks uploaded to the server.
-
-The `POST` request must be accompanied by a querystring parameter `key`.
-
-If the following conditions are met, the server responds with a <code>200 OK</code>:
-
-1. The chunks specified in the `chunks` list have all been uploaded.
-2. The uploadpassword file is removed to avoid any addition or alteration of the chunks.
-
-If the `key` does not match the password set by the server, HTTP <code>401 Unauthorized</code> is returned.
-
-If the key is not present HTTP <code>400 Bad Request</code> is returned.
-
-If a `PUT` is made to a file that is complete HTTP <code>409 Conflict</code> is returned.
-
-If the file has not been initiated, HTTP <code>412 Precondition Failed</code> is returned.
-
-
-GET /{id}
----------
-If the file `{id}` exists, the server responds with HTTP <code>200 OK</code>. Otherwise it returns HTTP <code>404</code>.
-
-
-GET /{id}/info
---------------
-If the file `{id}` exists a response with HTTP <code>200 OK</code> is returned with content-type `application/json` containing the fields:
-
-What about the size of the chunks? put them inside encrypted metadata?
-
-- `chunks` - The number of chunks the file consists of. (Should this in fact be an array with chunk file sizes?)
+- `chunks` - An array containing the size of the chunks present on the server in bytes.
 - `size` - Total size of all the chunks in bytes.
 - `complete` - `true` if the upload has been finished, `false` if not
-- `ip` - A list of all IPs that participated in uploading file `{id}`.
 - `expires` - The UNIX timestamp indicating when it will expire. (I'm not sure this should be UNIX)
 - `limit` (conditional)  - The total number of times the file can be downloaded in total. (Only present if `limit` was specified at file creation)
-- `downloads` (conditional) - The number of times the file has been downloaded so far. (Only present if `limit` was specified at file creation)
-
-If the file does not exist a response with HTTP <code>404 Not Found</code> is returned.
-
-Note that it is possible to retrieve information about files as soon as they are created, but not yet completed.
+- `downloads` - The number of times the file has been downloaded so far.
 
 
-GET /{id}/metadata
-------------------
-If the file exists, the response is HTTP <code>200 OK</code>. The response is of type `application/octet-stream` (is this true?) containing the encrypted metadata file.
+### DELETE /{id}
+Remove every trace on the server that the file was ever there
 
-(Return type depends a bit on the arguments that `POST` takes)
+The server requires the querystring parameter `key`.
 
+If the following conditions are met, the request succeeds:
 
-GET /{id}/{index}
------------------
-In order to obtain chunks a GET request is made. To download a chunk, only the `{id}` and `{index}` values are needed.
-
-If the file and chunks is found, a response with HTTP <code>200 OK</code> is returned. The content-type is `application/octet-stream` and contains the encrypted file.
-
-If the chunk is not without the range specified by `/{id}/info`, the server returns HTTP <code>416 Requested Range Not Satisfiable</code>.
-
-(What to do if the file is not found at all? 500 Internal Server Error?)
+1. All chunks related to file `{id}` are deleted
+2. All metadata information for file `{id}` is deleted.
+3. All properties or files relevant only to file `{id}` are deleted.
 
 
-DELETE /{id}
-------------
-Deletes all files relating to file `{id}` on the server.
+### POST /{id}/complete
+Completes the file upload for `{id}`, disabling any changes to the file.
 
-The request must be accompanied by a `key` querystring parameter matching the key specified in the initial `POST` request for that file.
+The server requires that the file upload `{id}` is initiated and not complete, as well as the querystring parameter `key`.
 
-On success the server responds with HTTP <code>200 OK</code>.
+The request must contain the field:
+- `chunks` - A list of the filesize in bytes for the upload chunks (in order).
 
-If `key` is wrong then the response is HTTP <code>401 Unauthorized</code> and no files are changed on the server.
+If the following conditions are met, the request succeeds:
 
-If the key is not present HTTP <code>400 Bad Request</code> is returned.
+1. The file `{id}` is initiated and not complete
+2. The number of chunks specified in `chunks` are present.
+3. The size of each chunk specified in `chunks` matches the respective one on the server.
 
-(Should subsequent requests now return <code>410 Gone</code> instead of <code>404 Not Found</code> from now on?)
 
-GET /info
--------------------
-`/info` This returns a json object with the following elements, which are all defined in the server config:
+### PUT /{id}/{index}
+Uploads a chunk with numerical `{index}` to file `{id}`.
 
-- `server_operator_email` (Server operator email)
-- `max_retention_hours` (The maximum number of hours a file will be kept on the server)
-- `max_chunksize_bytes` (The maximum permitted size of each chunk)
-- `max_filesize_bytes` (The maximum permitted total filesize)
+The server requires that the file upload `{id}` is initiated and not complete, as well as the querystring parameter `key`.
+
+The `Content-Type` of the request should be `multipart/form-data`.
+
+If the following conditions are met, the request succeeds:
+
+1. `{index}` is not larger than `max_chunks`
+2. The file is successfully persisted.
+
+The first time a chunk is uploaded, the server responds with HTTP <code>201 Created</code>.
+
+
+### GET /{id}/{index}
+Downloads the encrypted chunk `{index}` for the file `{id}`.
+
+The `Content-Type` of the response is `application/octet-stream`.
+
+
+### GET /{id}/metadata
+Yields the metadata information added by `PUT /{id}/metadata`.
+
+
+### PUT /{id}/metadata
+Adds or updates the metadata information for file `{id}`.
+
+The server requires that file upload `{id}` is initiated and not complete, as well as the querystring parameter `key`.
+
+The server does not require the presence of the field `metadata`, but the contents of that named field should be the encrypted metadata for the file.
+
+If the the following conditions are met, the request succeeds:
+
+1. The fields of the request are persisted.
+
+If no metadata is available, the client should assume a content type of `text/plain`.
+
+
+### OPTIONS /
+Returns information about the servers configuration.
+
+The response contains the following fields:
+
+- `operator_email` - Server operator email address.
+- `min_retention` - The least number of seconds the server promises to keep the file.
+- `max_size` - The maximum permitted size in bytes of a chunk.
+- `max_chunks` - The maximum number of chunks a file can consist of.
