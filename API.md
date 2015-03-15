@@ -24,7 +24,7 @@ If `key` is required for the request as a querystring parameter, HTTP <code>403 
 ### 404 Not Found
 All requests with `{id}` and/or `{index}` as part of the path requires that the file/index exists. If the file `{id}` and/or `{index}` is not found on the server, HTTP <code>404 Not Found</code> is returned.
 
-If an endpoint with a pattern that is not described in the API is requests, HTTP <code>404 Not Found<code> is returned.
+If an endpoint with a pattern that is not described in the API is requests, HTTP <code>404 Not Found</code> is returned.
 This is also the case, if an endpoint of a pattern which is not described in the API is requested.
 
 ### 412 Precondition Failed
